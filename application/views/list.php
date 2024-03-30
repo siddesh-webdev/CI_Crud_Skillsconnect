@@ -223,11 +223,16 @@
                                     <input name="contact" type="number" class="form-control shadow-none" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Picture</label>
-                                    <input name="profile" type="file" accept=".jpg, .jpeg, .png, .webp"
-                                        class="form-control shadow-none" required>
 
+                                    <label class="form-label">Picture</label>
+                                    <div class="row">
+                                        <img src="" name="image" width='55px' class=" img-fluid">
+                                        <br>
+                                        <input name="profile" type="file" accept=".jpg, .jpeg, .png, .webp"
+                                            class="form-control shadow-none mt-2" required>
+                                    </div>
                                 </div>
+
 
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Gender</label>
@@ -472,18 +477,19 @@
             edit_form.elements['name'].value = data.player_details.name;
             edit_form.elements['email'].value = data.player_details.email;
             edit_form.elements['contact'].value = data.player_details.contact;
-            // edit_form.elements['profile'].file[0] = data.player_details.profile;
             edit_form.elements['gender'].value = data.player_details.gender;
             edit_form.elements['address'].value = data.address_details.address;
-            // edit_form.elements['state'].value = data.address_details.state_id;
-            // edit_form.elements['city'].value = data.address_details.city_id;
-            // edit_form.elements['country'].value = data.address_details.country_id;
+            let imageElement = document.getElementsByName('image')[0];
+            imageElement.src = data.player_details.profile;
+
 
             // let stateSelect = document.getElementById('state_1');
             // let citySelect = document.getElementById('city_1');
 
             let countrySelect = edit_form.elements['country'];
-           
+            let selectedCountryId = data.address_details.country_id;
+            let selectedStateId = data.address_details.state_id;
+
             let countryOptions = countrySelect.options;
             for (let i = 0; i < countryOptions.length; i++) {
                 if (countryOptions[i].value === data.address_details.country_id) {
@@ -492,35 +498,99 @@
                 }
             }
 
-           
+            // Fetching state..
             let stateSelect = edit_form.elements['state'];
-            // let state_id =data.address_details.state_id;
             let stateOptions = stateSelect.options;
 
-            for (let i = 0; i < stateOptions.length; i++) {
+            $.ajax({
+                url: "<?php echo base_url(); ?>AjaxController/fetch_state",
+                method: "POST",
+                data: { country_id: selectedCountryId },
+                success: function (stateData) {
+                    stateSelect.innerHTML = stateData;
 
-                if (stateOptions[i].value === data.address_details.state_id) {
-                    stateSelect.selectedIndex = i;
-                    break;
-                }
-            }
+                    for (let i = 0; i < stateOptions.length; i++) {
+                        if (stateOptions[i].value === data.address_details.state_id) {
+                            stateSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    // Fetching ciitiess.
+                    let citySelect = edit_form.elements['city'];
+                    let cityOptions = citySelect.options
 
-       
-            let citySelect = edit_form.elements['city'];
-       
-            let cityOptions = citySelect.options;
-            for (let i = 0; i < cityOptions.length; i++) {
-                if (cityOptions[i].value === data.address_details.city_id) {
-                    citySelect.selectedIndex = i;
-                    break;
+                    $.ajax({
+                        type: 'POST',
+                        url: "<?php echo base_url(); ?>AjaxController/fetch_city",
+                        data: {
+                            state_id: selectedStateId,
+                            country_id: selectedCountryId
+                        },
+                        success: function (cityData) {
+                            citySelect.innerHTML = cityData;
+                            // Setting cities
+                            for (let i = 0; i < cityOptions.length; i++) {
+                                if (cityOptions[i].value === data.address_details.city_id) {
+                                    citySelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    });
                 }
-            }
+            });
+
 
 
         }
         xhr.send('get_player=' + id);
 
     }
+
+
+
+    function submit_edit() {
+
+        let data = new FormData();
+        data.append('edit_user', '');
+        data.append('player_id', edit_form.elements['player_id'].value);
+        data.append('name', edit_form.elements['name'].value);
+        data.append('email', edit_form.elements['email'].value);
+        data.append('contact', edit_form.elements['contact'].value);
+        data.append('profile', edit_form.elements['profile'].files[0]);
+        data.append('gender', edit_form.elements['gender'].value);
+
+        data.append('state', edit_form.elements['state'].value);
+        data.append('country', edit_form.elements['country'].value);
+        data.append('city', edit_form.elements['city'].value);
+        data.append('address', edit_form.elements['address'].value);
+
+        data.append('master_name', '<?php echo $_SESSION['name']; ?>');
+        data.append('master_id', '<?php echo $_SESSION['id']; ?>');
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '<?php echo base_url(); ?>UserDetails/submiteditPlayer', true);
+
+        xhr.onload = function () {
+            var myModal = document.getElementById('edit_form');
+            var modal = bootstrap.Modal.getInstance(myModal); // Returns a Bootstrap modal instance
+            modal.hide();
+
+            if (this.responseText == 1) {
+                alert('success', 'Room Data Edited !');
+
+                edit_form.reset();
+                get_players();
+            }
+            else {
+                alert('error', 'Server Down..!')
+            }
+        }
+        xhr.send(data);
+
+    }
+
 
     edit_form.addEventListener('submit', function (e) {
         e.preventDefault();

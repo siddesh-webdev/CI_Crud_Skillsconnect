@@ -95,5 +95,10 @@ class PlayerModel extends CI_Model
 
 
     }
+
+    function updatePlayer($id, $data)
+    {
+
+    }
 }
 ?>

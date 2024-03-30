@@ -222,5 +222,52 @@ class UserDetails extends CI_Controller
             echo $data;
         }
     }
+
+
+    public function submiteditPlayer()
+    {
+        if(isset($_POST['edit_user']))
+        {
+            $config['upload_path']   = './upload/';
+
+            $config['allowed_types'] = 'gif|jpg|png';
+
+            $this->load->library('upload', $config);
+
+            $this->upload->initialize($config);
+
+            if ( ! $this->upload->do_upload('profile'))
+            {
+                    $error = array('error' => $this->upload->display_errors());
+            }
+            else
+            {
+                    $data = $this->upload->data();
+                    $img_path = base_url('upload/'. $data['file_name']);
+
+                    $_POST['profile'] = $img_path;
+            }
+ 
+            $img_p = $_POST['profile'] ;
+            $name = $this->input->post('name');
+            $email = $this->input->post('email');
+        
+            $contact = $this->input->post('contact');
+            $gender = $this->input->post('gender');
+            $master_id = $this->input->post('master_id');
+
+            $data = array(
+                'master_id' => $master_id,
+                'name' => $name,
+                'email' => $email,
+                'contact' => $contact,
+                'profile' => $img_p,
+                'gender' => $gender
+            );
+
+            $this->PlayerModel->update_player($data);
+
+        }
+    }
 }
 ?>
