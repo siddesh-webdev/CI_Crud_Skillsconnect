@@ -15,6 +15,13 @@ class AjaxModel extends CI_Model
 
     }
 
+   function fetch_Address_count($id)
+   {
+    $this->db->where('player_id', $id);
+    $query = $this->db->get("player_address");
+    return $query->num_rows();
+   }
+
     function fetch_state($country_id)
     {
         $this->db->where("country_id", $country_id);
@@ -91,6 +98,8 @@ class AjaxModel extends CI_Model
             return ['id' => $user->id, 'name' => $user->name];
         }
     }
+
+    
 }
 
 ?>

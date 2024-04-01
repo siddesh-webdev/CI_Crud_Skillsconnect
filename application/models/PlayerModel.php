@@ -49,15 +49,27 @@ class PlayerModel extends CI_Model
     function getAll_playerdtl()
     {
         $master_id = $this->session->userdata('id');
-        
-        $query = $this->db->select('bo.*, bd.*,bo.id as bo_id')
-            ->from('player_dtl bo')
-            ->join('player_address bd', 'bo.id = bd.player_id')
-            
-            ->where('bo.master_id=' . $master_id)
-           
+
+        // $query = $this->db->select('bo.*, bd.*,bo.id as bo_id')
+        //     ->from('player_dtl bo')
+        //     ->join('player_address bd', 'bo.id = bd.player_id')
+
+        //     ->where('bo.master_id=' . $master_id)
+
+        //     ->where('bo.status', 1)
+
+        //     ->get();
+
+        $subquery = $this->db->select('MAX(id) as id, player_id, MAX(address) as address')
+            ->from('player_address')
+            ->group_by('player_id')
+            ->get_compiled_select();
+
+        $query = $this->db->select('bo.*, bd.*, bo.id as bo_id')
+            ->from("($subquery) bd")
+            ->join('player_dtl bo', 'bo.id = bd.player_id', 'left')
+            ->where('bo.master_id', $master_id)
             ->where('bo.status', 1)
-            
             ->get();
 
         if ($query->num_rows() > 0) {
@@ -120,6 +132,23 @@ class PlayerModel extends CI_Model
         } else {
             return false;
         }
+    }
+
+    function getAlladdress($id)
+    {
+        $this->db->where('player_id', $id);
+        $query = $this->db->get("player_address");
+
+    
+        $address_details = $query->result();
+    
+        $address_count = $query->num_rows();
+    
+        // Return both address details and count as an array
+        return array(
+            'address_details' => $address_details,
+            'address_count' => $address_count
+        );
     }
 }
 ?>

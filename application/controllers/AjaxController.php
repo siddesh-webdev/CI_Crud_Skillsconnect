@@ -24,6 +24,13 @@ class AjaxController extends CI_Controller
         $this->load->view("list", $data);
 
     }
+    public function fetchingCount(){
+
+        $player_id=1;
+
+        $address_count = $this->AjaxModel->fetch_Address_count($player_id);
+
+    } 
 
     public function signUp()
     {

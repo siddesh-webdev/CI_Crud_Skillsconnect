@@ -249,10 +249,8 @@
                                 </h5>
 
                                 <!-- Address details -->
-                
-
-                                <div id="addressFields" class="addressFields" row_count="1">
-                                    <div class="row mb-3">
+                                <div id="addressFields1" class="addressFields1" row_count="1">
+                                    <!-- <div class="row mb-3">
                                         <div class="col-md-12">
                                             <label class="form-label">Address line</label>
                                             <textarea id="address" name="address" class="form-control shadow-none"
@@ -260,13 +258,7 @@
                                         </div>
                                         <div class="col-md-4 mb-3 mt-2">
                                             <label class="form-label">Country</label>
-                                            <?php
-                                            $options = array('' => 'Select Country');
-                                            foreach ($countries as $row) {
-                                                $options[$row->id] = $row->name;
-                                            }
-                                            echo form_dropdown('country', $options, '', 'id="countrys_1" class="form-select country1" aria-label="Default select example" row_count="1"');
-                                            ?>
+                                           
                                         </div>
                                         <div class="col-md-4 mt-2">
                                             <label class="form-label">State</label>
@@ -283,7 +275,7 @@
                                             </select>
                                         </div>
                                         <input type="hidden" name="player_id">
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <!-- Button to add more address fields -->
                                 <div class="col-md-6 mb-3">
@@ -516,6 +508,23 @@
 
     function edit_details(id) {
 
+
+        $.ajax({
+                type: 'POST',
+                url: "<?php echo base_url(); ?>UserDetails/givemeAddress",
+                data: {
+                    id: id
+                },
+                success: function (response) {
+                  
+                    $("#addressFields1").html(response);
+                },
+                error: function (xhr, status, error) {
+                    // Handle error if AJAX request fails
+                    console.error(xhr.responseText);
+                }
+            });
+
         let xhr = new XMLHttpRequest();
 
         xhr.open('POST', '<?php echo base_url(); ?>UserDetails/editPlayer', true);
@@ -528,8 +537,8 @@
             edit_form.elements['email'].value = data.player_details.email;
             edit_form.elements['contact'].value = data.player_details.contact;
             edit_form.elements['gender'].value = data.player_details.gender;
-            edit_form.elements['address'].value = data.address_details.address;
-            edit_form.elements['player_id'].value = data.player_details.id;
+            // edit_form.elements['address'].value = data.address_details.address;
+            // edit_form.elements['player_id'].value = data.player_details.id;
             let imageElement = document.getElementsByName('image')[0];
             imageElement.src = data.player_details.profile;
 
@@ -537,60 +546,55 @@
             // let stateSelect = document.getElementById('state_1');
             // let citySelect = document.getElementById('city_1');
 
-            let countrySelect = edit_form.elements['country'];
-            let selectedCountryId = data.address_details.country_id;
-            let selectedStateId = data.address_details.state_id;
+            // let countrySelect = edit_form.elements['country'];
+            // let selectedCountryId = data.address_details.country_id;
+            // let selectedStateId = data.address_details.state_id;
 
-            let countryOptions = countrySelect.options;
-            for (let i = 0; i < countryOptions.length; i++) {
-                if (countryOptions[i].value === data.address_details.country_id) {
-                    countrySelect.selectedIndex = i;
-                    break;
-                }
-            }
+            let countrySelect = edit_form.elements['country'];
+            countrySelect.value = data.address_details.country_id;
+
+            // let countryOptions = countrySelect.options;
+            // for (let i = 0; i < countryOptions.length; i++) {
+            //     if (countryOptions[i].value === data.address_details.country_id) {
+            //         countrySelect.selectedIndex = i;
+            //         break;
+            //     }
+            // }
+
 
             // Fetching state..
             let stateSelect = edit_form.elements['state'];
-            let stateOptions = stateSelect.options;
+            // let stateOptions = stateSelect.options;
 
             $.ajax({
                 url: "<?php echo base_url(); ?>AjaxController/fetch_state",
                 method: "POST",
-                data: { country_id: selectedCountryId },
+                data: { country_id: data.address_details.country_id },
                 success: function (stateData) {
+    
+                    let stateSelect = edit_form.elements['state'];
                     stateSelect.innerHTML = stateData;
-
-                    for (let i = 0; i < stateOptions.length; i++) {
-                        if (stateOptions[i].value === data.address_details.state_id) {
-                            stateSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
+                    stateSelect.value = data.address_details.state_id;
                     // Fetching ciitiess.
-                    let citySelect = edit_form.elements['city'];
-                    let cityOptions = citySelect.options
+                    // let citySelect = edit_form.elements['city'];
+                    // let cityOptions = citySelect.options
 
                     $.ajax({
                         type: 'POST',
                         url: "<?php echo base_url(); ?>AjaxController/fetch_city",
                         data: {
-                            state_id: selectedStateId,
-                            country_id: selectedCountryId
+                            state_id: data.address_details.state_id,
+                            country_id: data.address_details.country_id
                         },
                         success: function (cityData) {
+                            let citySelect = edit_form.elements['city'];
                             citySelect.innerHTML = cityData;
-                            // Setting cities
-                            for (let i = 0; i < cityOptions.length; i++) {
-                                if (cityOptions[i].value === data.address_details.city_id) {
-                                    citySelect.selectedIndex = i;
-                                    break;
-                                }
-                            }
+                            citySelect.value = data.address_details.city_id;
+                   
                         }
                     });
                 }
             });
-
 
 
         }

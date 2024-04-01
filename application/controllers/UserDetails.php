@@ -12,14 +12,14 @@ class UserDetails extends CI_Controller
 
     public function addPlayer()
     {
-     
+
         if (isset($_POST['send'])) {
 
             // echo "<pre>";
             // print_r($_FILES['profile']);
             // exit;
 
-            $config['upload_path']   = './upload/';
+            $config['upload_path'] = './upload/';
 
             $config['allowed_types'] = 'gif|jpg|png';
 
@@ -27,24 +27,21 @@ class UserDetails extends CI_Controller
 
             $this->upload->initialize($config);
 
-            if ( ! $this->upload->do_upload('profile'))
-            {
-                    $error = array('error' => $this->upload->display_errors());
+            if (!$this->upload->do_upload('profile')) {
+                $error = array('error' => $this->upload->display_errors());
 
 
+            } else {
+                $data = $this->upload->data();
+                $img_path = base_url('upload/' . $data['file_name']);
+
+                $_POST['profile'] = $img_path;
             }
-            else
-            {
-                    $data = $this->upload->data();
-                    $img_path = base_url('upload/'. $data['file_name']);
 
-                    $_POST['profile'] = $img_path;
-            }
- 
-            $img_p = $_POST['profile'] ;
+            $img_p = $_POST['profile'];
             $name = $this->input->post('name');
             $email = $this->input->post('email');
-        
+
             $contact = $this->input->post('contact');
             $gender = $this->input->post('gender');
             $master_id = $this->input->post('master_id');
@@ -183,41 +180,102 @@ class UserDetails extends CI_Controller
                         </td>
                     </tr>
                 ";
-            $i++; 
+            $i++;
         }
-   
+
         $output = json_encode(["table_data" => $table_data]);
         echo $output;
 
     }
 
+    public function givemeAddress()
+    {
+        $id = $_POST['id'];
+
+        $Alldata = $this->PlayerModel->getAllAddress($id);
+
+        $address_data = "";
+
+        $i = 1;
+
+
+        foreach ($Alldata['address_details'] as $data) {
+
+            $countries = $this->AjaxModel->fetch_country();
+            // Append HTML for each address
+            // echo "<pre>";
+            // print_r($data->city_id);
+            // echo "<br>";
+            // print_r($data->country_id);
+            // echo "<br>";
+            // print_r($data->state_id);
+            // exit;
+            $address_data .= '
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="form-label">Address line</label>
+                    <textarea id="address_' . $i . '" name="address_' . $i . '" class="form-control shadow-none" rows="1" required>' . $data->address . '</textarea>
+                </div>
+                <div class="col-md-4 mb-3 mt-2">
+                    <label class="form-label">Country</label>
+                    <select id="countrys_' . $i . '" name="country_' . $i . '" class="form-select country1" aria-label="Default select example" row_count="' . $i . '">
+                        <option value="' . $data->country_id . '" selected></option>';
+          
+            foreach ($countries as $country) {
+              
+                $selected = ($country->id == $data->country_id) ? 'selected' : '';
+              
+                $address_data .= '<option value="' . $country->id . '" ' . $selected . '>' . $country->name . '</option>';
+            }
+            $address_data .= '
+                    </select>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <label class="form-label">State</label>
+                    <select id="state_' . $i . '" name="state_' . $i . '" class="form-select statessc" aria-label="Default select example" row_count="' . $i . '">
+                        <option value="">Select state</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <label class="form-label">City</label>
+                    <select id="city_' . $i . '" name="city_' . $i . '" class="form-select" aria-label="Default select example">
+                        <option value="' . $data->city_id . '">Select city</option>
+                    </select>
+                </div>
+            </div>';
+            $i++;
+        }
+
+        // Echo or return the generated HTML
+        echo $address_data;
+    }
+
 
     public function removePlayer()
     {
-        if(isset($_POST['remove_user']))
-        {
-            $id= $this->input->post('user_id');
-           
-            if($this->PlayerModel->delPlayer($id))
-            {
+        if (isset($_POST['remove_user'])) {
+            $id = $this->input->post('user_id');
 
-            echo 1;
-            }
-            else{
+            if ($this->PlayerModel->delPlayer($id)) {
 
-            echo 0;
-            
+                echo 1;
+            } else {
+
+                echo 0;
+
             }
         }
     }
 
     public function editPlayer()
     {
-        if(isset($_POST['get_player']))
-        {
-            $id= $this->input->post('get_player');
+        if (isset($_POST['get_player'])) {
+            $id = $this->input->post('get_player');
+
+            $count = $this->AjaxModel->fetch_Address_count($id);
 
             $data = $this->PlayerModel->getPlayer($id);
+
 
             echo $data;
         }
@@ -226,15 +284,14 @@ class UserDetails extends CI_Controller
 
     public function submiteditPlayer()
     {
-        if(isset($_POST['edit_user']))
-        {
+        if (isset($_POST['edit_user'])) {
             $name = $this->input->post('name');
             $email = $this->input->post('email');
-            $player_id= $this->input->post('player_id');
+            $player_id = $this->input->post('player_id');
             $contact = $this->input->post('contact');
             $gender = $this->input->post('gender');
-        
-            $config['upload_path']   = './upload/';
+
+            $config['upload_path'] = './upload/';
 
             $config['allowed_types'] = 'gif|jpg|png';
 
@@ -242,38 +299,35 @@ class UserDetails extends CI_Controller
 
             $this->upload->initialize($config);
 
-            if ( ! $this->upload->do_upload('profile'))
-            {
-                    $error = array('error' => $this->upload->display_errors());
-            }
-            else
-            {
-                    $data = $this->upload->data();
-                    $img_path = base_url('upload/'. $data['file_name']);
-                    $_POST['profile'] = $img_path;
-                    $img_p = $_POST['profile'] ;
-                
-                    $data = array(
-                        'name' => $name,
-                        'email' => $email,
-                        'contact' => $contact,
-                        'profile' => $img_p,
-                        'gender' => $gender
-                    );
+            if (!$this->upload->do_upload('profile')) {
+                $error = array('error' => $this->upload->display_errors());
+            } else {
+                $data = $this->upload->data();
+                $img_path = base_url('upload/' . $data['file_name']);
+                $_POST['profile'] = $img_path;
+                $img_p = $_POST['profile'];
 
-                    // if($this->PlayerModel->updatePlayer($player_id,$data))
-                    // {
-                    //     echo 1;
-                    //     exit;
-                    // }
-                    // else
-                    // {
-                    //     echo 0;
-                    //     exit;
-                    // }
-                    $this->PlayerModel->updatePlayer($player_id,$data);
+                $data = array(
+                    'name' => $name,
+                    'email' => $email,
+                    'contact' => $contact,
+                    'profile' => $img_p,
+                    'gender' => $gender
+                );
+
+                // if($this->PlayerModel->updatePlayer($player_id,$data))
+                // {
+                //     echo 1;
+                //     exit;
+                // }
+                // else
+                // {
+                //     echo 0;
+                //     exit;
+                // }
+                $this->PlayerModel->updatePlayer($player_id, $data);
             }
-            
+
             $data = array(
                 'name' => $name,
                 'email' => $email,
@@ -281,8 +335,8 @@ class UserDetails extends CI_Controller
                 'gender' => $gender
             );
 
-        
-            
+
+
 
             $addressCount = 1;
             // Iterate through each address field
@@ -303,10 +357,9 @@ class UserDetails extends CI_Controller
                 $full_address = $_POST['address'];
             }
 
-         
 
-            if(isset($_POST['city']))
-            {
+
+            if (isset($_POST['city'])) {
                 $city_id = $this->input->post('city');
                 $state_id = $this->input->post('state');
                 $country_id = $this->input->post('country');
@@ -314,27 +367,23 @@ class UserDetails extends CI_Controller
                 $data2 = array(
                     'address' => $full_address,
                     'country_id' => $country_id,
-                    'state_id' => $state_id ,
-                    'city_id' => $city_id 
+                    'state_id' => $state_id,
+                    'city_id' => $city_id
                 );
-                if($this->PlayerModel->updatePlayerAd($player_id,$data2))
-                {
+                if ($this->PlayerModel->updatePlayerAd($player_id, $data2)) {
                     echo 1;
-                }
-                else{
-                   return false;
+                } else {
+                    return false;
                 }
             }
 
-            if($this->PlayerModel->updatePlayer($player_id,$data))
-            {
+            if ($this->PlayerModel->updatePlayer($player_id, $data)) {
                 echo 1;
-            }
-            else{
+            } else {
                 return false;
             }
 
-           
+
         }
     }
 }
