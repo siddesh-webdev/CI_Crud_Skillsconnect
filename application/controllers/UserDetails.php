@@ -228,6 +228,12 @@ class UserDetails extends CI_Controller
     {
         if(isset($_POST['edit_user']))
         {
+            $name = $this->input->post('name');
+            $email = $this->input->post('email');
+            $player_id= $this->input->post('player_id');
+            $contact = $this->input->post('contact');
+            $gender = $this->input->post('gender');
+        
             $config['upload_path']   = './upload/';
 
             $config['allowed_types'] = 'gif|jpg|png';
@@ -244,29 +250,91 @@ class UserDetails extends CI_Controller
             {
                     $data = $this->upload->data();
                     $img_path = base_url('upload/'. $data['file_name']);
-
                     $_POST['profile'] = $img_path;
-            }
- 
-            $img_p = $_POST['profile'] ;
-            $name = $this->input->post('name');
-            $email = $this->input->post('email');
-        
-            $contact = $this->input->post('contact');
-            $gender = $this->input->post('gender');
-            $master_id = $this->input->post('master_id');
+                    $img_p = $_POST['profile'] ;
+                
+                    $data = array(
+                        'name' => $name,
+                        'email' => $email,
+                        'contact' => $contact,
+                        'profile' => $img_p,
+                        'gender' => $gender
+                    );
 
+                    // if($this->PlayerModel->updatePlayer($player_id,$data))
+                    // {
+                    //     echo 1;
+                    //     exit;
+                    // }
+                    // else
+                    // {
+                    //     echo 0;
+                    //     exit;
+                    // }
+                    $this->PlayerModel->updatePlayer($player_id,$data);
+            }
+            
             $data = array(
-                'master_id' => $master_id,
                 'name' => $name,
                 'email' => $email,
                 'contact' => $contact,
-                'profile' => $img_p,
                 'gender' => $gender
             );
 
-            $this->PlayerModel->update_player($data);
+        
+            
 
+            $addressCount = 1;
+            // Iterate through each address field
+            for ($i = 1; $i < 5; $i++) {
+                $addressField = isset($_POST['address_' . $i]) ? trim($_POST['address_' . $i]) : '';
+                // Check if the address field is not empty
+                if (!empty($addressField)) {
+                    $addressCount++;
+                }
+
+            }
+            //adding full address in database
+            if ($addressCount == 3) {
+                $full_address = $_POST['address'] . ", " . $_POST['address_2'] . ", " . $_POST['address_3'];
+            } else if ($addressCount == 2) {
+                $full_address = $_POST['address'] . ", " . $_POST['address_2'];
+            } else {
+                $full_address = $_POST['address'];
+            }
+
+         
+
+            if(isset($_POST['city']))
+            {
+                $city_id = $this->input->post('city');
+                $state_id = $this->input->post('state');
+                $country_id = $this->input->post('country');
+
+                $data2 = array(
+                    'address' => $full_address,
+                    'country_id' => $country_id,
+                    'state_id' => $state_id ,
+                    'city_id' => $city_id 
+                );
+                if($this->PlayerModel->updatePlayerAd($player_id,$data2))
+                {
+                    echo 1;
+                }
+                else{
+                   return false;
+                }
+            }
+
+            if($this->PlayerModel->updatePlayer($player_id,$data))
+            {
+                echo 1;
+            }
+            else{
+                return false;
+            }
+
+           
         }
     }
 }

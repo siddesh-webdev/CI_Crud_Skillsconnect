@@ -229,7 +229,7 @@
                                         <img src="" name="image" width='55px' class=" img-fluid">
                                         <br>
                                         <input name="profile" type="file" accept=".jpg, .jpeg, .png, .webp"
-                                            class="form-control shadow-none mt-2" required>
+                                            class="form-control shadow-none mt-2">
                                     </div>
                                 </div>
 
@@ -249,6 +249,7 @@
                                 </h5>
 
                                 <!-- Address details -->
+                
 
                                 <div id="addressFields" class="addressFields" row_count="1">
                                     <div class="row mb-3">
@@ -264,23 +265,24 @@
                                             foreach ($countries as $row) {
                                                 $options[$row->id] = $row->name;
                                             }
-                                            echo form_dropdown('country', $options, '', 'id="country_1" class="form-select country" aria-label="Default select example" row_count="1"');
+                                            echo form_dropdown('country', $options, '', 'id="countrys_1" class="form-select country1" aria-label="Default select example" row_count="1"');
                                             ?>
                                         </div>
                                         <div class="col-md-4 mt-2">
                                             <label class="form-label">State</label>
-                                            <select id="state_1" name="state" class="form-select statessc"
+                                            <select id="states_1" name="state" class="form-select statesscs"
                                                 aria-label="Default select example" row_count="1">
                                                 <option value="">Select state</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4 mt-2">
                                             <label class="form-label">City</label>
-                                            <select id="city_1" name="city" class="form-select"
+                                            <select id="citys_1" name="city" class="form-select"
                                                 aria-label="Default select example" row_count="1">
                                                 <option value="">Select city</option>
                                             </select>
                                         </div>
+                                        <input type="hidden" name="player_id">
                                     </div>
                                 </div>
                                 <!-- Button to add more address fields -->
@@ -307,6 +309,8 @@
 
 
 <script>
+
+    //addd model ajax
     //fetching state in basis of country  
     $(document).on("change", '.country', function () {
 
@@ -350,6 +354,52 @@
         } else {
             $('#state_' + row_count).html('<option value="">Select country first</option>');
             $('#city_' + row_count).html('<option value="">Select state first</option>');
+        }
+    });
+
+    //edit model ajax
+    $(document).on("change", '.country1', function () {
+
+        var country_id = $(this).val();
+
+        var row_count = $(this).attr("row_count");
+
+        if (country_id != '') {
+            $.ajax({
+                url: "<?php echo base_url(); ?>AjaxController/fetch_state",
+                method: "POST",
+                data: { country_id: country_id },
+                success: function (data) {
+                    $('#states_' + row_count).html(data);
+                    $('#citys_' + row_count).html('<option value="">Select City</option>');
+                }
+            });
+        }
+        else {
+            $('#states_' + row_count).html('<option value="">Select country first</option>');
+            $('#citys_' + row_count).html('<option value="">Select state first</option>');
+        }
+    });
+
+    $(document).on("change", ".statesscs", function () {
+        var row_count = $(this).attr("row_count");
+        var state_id = $(this).val();
+        var country_id = $('#countrys_' + row_count).val();
+        if (country_id != '') {
+            $.ajax({
+                type: 'POST',
+                url: "<?php echo base_url(); ?>AjaxController/fetch_city",
+                data: {
+                    state_id: state_id,
+                    country_id: country_id
+                },
+                success: function (data) {
+                    $('#citys_' + row_count).html(data);
+                }
+            });
+        } else {
+            $('#states' + row_count).html('<option value="">Select country first</option>');
+            $('#citys_' + row_count).html('<option value="">Select state first</option>');
         }
     });
 
@@ -479,6 +529,7 @@
             edit_form.elements['contact'].value = data.player_details.contact;
             edit_form.elements['gender'].value = data.player_details.gender;
             edit_form.elements['address'].value = data.address_details.address;
+            edit_form.elements['player_id'].value = data.player_details.id;
             let imageElement = document.getElementsByName('image')[0];
             imageElement.src = data.player_details.profile;
 
@@ -565,26 +616,24 @@
         data.append('city', edit_form.elements['city'].value);
         data.append('address', edit_form.elements['address'].value);
 
-        data.append('master_name', '<?php echo $_SESSION['name']; ?>');
-        data.append('master_id', '<?php echo $_SESSION['id']; ?>');
-
         let xhr = new XMLHttpRequest();
 
         xhr.open('POST', '<?php echo base_url(); ?>UserDetails/submiteditPlayer', true);
 
         xhr.onload = function () {
-            var myModal = document.getElementById('edit_form');
+
+            var myModal = document.getElementById('editModel');
             var modal = bootstrap.Modal.getInstance(myModal); // Returns a Bootstrap modal instance
             modal.hide();
 
             if (this.responseText == 1) {
-                alert('success', 'Room Data Edited !');
-
+                alert('Player Data Edited !');
                 edit_form.reset();
                 get_players();
             }
             else {
-                alert('error', 'Server Down..!')
+                alert('Server Down..!')
+                get_players();
             }
         }
         xhr.send(data);

@@ -49,11 +49,15 @@ class PlayerModel extends CI_Model
     function getAll_playerdtl()
     {
         $master_id = $this->session->userdata('id');
+        
         $query = $this->db->select('bo.*, bd.*,bo.id as bo_id')
             ->from('player_dtl bo')
             ->join('player_address bd', 'bo.id = bd.player_id')
+            
             ->where('bo.master_id=' . $master_id)
+           
             ->where('bo.status', 1)
+            
             ->get();
 
         if ($query->num_rows() > 0) {
@@ -89,8 +93,8 @@ class PlayerModel extends CI_Model
             'address_details' => $address_details
         );
 
-        $result =json_encode($result);
-      
+        $result = json_encode($result);
+
         return $result;
 
 
@@ -98,7 +102,24 @@ class PlayerModel extends CI_Model
 
     function updatePlayer($id, $data)
     {
+        $this->db->where('id', $id);
+        $result = $this->db->update('player_dtl', $data);
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    function updatePlayerAd($id, $data)
+    {
+        $this->db->where('player_id', $id);
+        $result = $this->db->update('player_address', $data);
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 ?>
