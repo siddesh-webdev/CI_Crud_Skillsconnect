@@ -199,9 +199,10 @@ class UserDetails extends CI_Controller
         $i = 1;
 
 
+        $countries = $this->AjaxModel->fetch_country();
+
         foreach ($Alldata['address_details'] as $data) {
 
-            $countries = $this->AjaxModel->fetch_country();
             // Append HTML for each address
             // echo "<pre>";
             // print_r($data->city_id);
@@ -218,13 +219,13 @@ class UserDetails extends CI_Controller
                 </div>
                 <div class="col-md-4 mb-3 mt-2">
                     <label class="form-label">Country</label>
-                    <select id="countrys_' . $i . '" name="country_' . $i . '" class="form-select country1" aria-label="Default select example" row_count="' . $i . '">
-                        <option value="' . $data->country_id . '" selected></option>';
-          
+                    <select id="countrys_' . $i . '" name="country_' . $i . '" class="form-select country1" aria-label="Default select example" row_count="' . $i . '" pre_state = "' . $data->state_id . '"  >
+                        <option value="" >Select country </option>';
+
             foreach ($countries as $country) {
-              
+
                 $selected = ($country->id == $data->country_id) ? 'selected' : '';
-              
+
                 $address_data .= '<option value="' . $country->id . '" ' . $selected . '>' . $country->name . '</option>';
             }
             $address_data .= '
@@ -232,18 +233,24 @@ class UserDetails extends CI_Controller
                 </div>
                 <div class="col-md-4 mt-2">
                     <label class="form-label">State</label>
-                    <select id="state_' . $i . '" name="state_' . $i . '" class="form-select statessc" aria-label="Default select example" row_count="' . $i . '">
-                        <option value="">Select state</option>
+                    
+                    <select id="states_' . $i . '" name="state_' . $i . '" class="form-select statesscs" aria-label="Default select example" row_count="' . $i . '" pre_city="' . $data->city_id . '" pres_state = "' . $data->state_id . '">
+                        <option value="" >Select state</option>
                     </select>
                 </div>
+                
+
                 <div class="col-md-4 mt-2">
                     <label class="form-label">City</label>
-                    <select id="city_' . $i . '" name="city_' . $i . '" class="form-select" aria-label="Default select example">
-                        <option value="' . $data->city_id . '">Select city</option>
+                    <input type="hidden" name="pre_city_' . $i . '" id="pre_city_' . $i . '" value="' . $data->city_id . '" /> 
+                    <select id="citys_' . $i . '" name="city_' . $i . '" class="form-select" aria-label="Default select example">
+                        <option value="">Select city</option>
                     </select>
                 </div>
             </div>';
             $i++;
+
+
         }
 
         // Echo or return the generated HTML
@@ -285,6 +292,7 @@ class UserDetails extends CI_Controller
     public function submiteditPlayer()
     {
         if (isset($_POST['edit_user'])) {
+            
             $name = $this->input->post('name');
             $email = $this->input->post('email');
             $player_id = $this->input->post('player_id');
@@ -315,16 +323,6 @@ class UserDetails extends CI_Controller
                     'gender' => $gender
                 );
 
-                // if($this->PlayerModel->updatePlayer($player_id,$data))
-                // {
-                //     echo 1;
-                //     exit;
-                // }
-                // else
-                // {
-                //     echo 0;
-                //     exit;
-                // }
                 $this->PlayerModel->updatePlayer($player_id, $data);
             }
 

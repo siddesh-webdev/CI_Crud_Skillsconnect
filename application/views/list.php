@@ -210,6 +210,7 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
+                            <input name="player_id" type="hidden">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Player Name</label>
                                     <input name="name" type="text" class="form-control shadow-none" required>
@@ -250,32 +251,9 @@
 
                                 <!-- Address details -->
                                 <div id="addressFields1" class="addressFields1" row_count="1">
-                                    <!-- <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label class="form-label">Address line</label>
-                                            <textarea id="address" name="address" class="form-control shadow-none"
-                                                rows="1" required></textarea>
-                                        </div>
-                                        <div class="col-md-4 mb-3 mt-2">
-                                            <label class="form-label">Country</label>
-                                           
-                                        </div>
-                                        <div class="col-md-4 mt-2">
-                                            <label class="form-label">State</label>
-                                            <select id="states_1" name="state" class="form-select statesscs"
-                                                aria-label="Default select example" row_count="1">
-                                                <option value="">Select state</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mt-2">
-                                            <label class="form-label">City</label>
-                                            <select id="citys_1" name="city" class="form-select"
-                                                aria-label="Default select example" row_count="1">
-                                                <option value="">Select city</option>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" name="player_id">
-                                    </div> -->
+
+                                
+
                                 </div>
                                 <!-- Button to add more address fields -->
                                 <div class="col-md-6 mb-3">
@@ -301,6 +279,8 @@
 
 
 <script>
+
+
 
     //addd model ajax
     //fetching state in basis of country  
@@ -349,12 +329,13 @@
         }
     });
 
-    //edit model ajax
+  //editting model
     $(document).on("change", '.country1', function () {
 
         var country_id = $(this).val();
 
         var row_count = $(this).attr("row_count");
+
 
         if (country_id != '') {
             $.ajax({
@@ -390,10 +371,74 @@
                 }
             });
         } else {
+            $('#states_' + row_count).html('<option value="">Select country first</option>');
+            $('#citys_' + row_count).html('<option value="">Select state first</option>');
+        }
+    });
+
+
+  //edit model ajax
+    function getstate() {
+      
+        $(".country1").each(function (index) {
+            // console.log($(this));
+            var country_id = $(this).val();
+            var row_count = $(this).attr("row_count");
+            var row_state_id = $(this).attr("pre_state");
+          
+
+            if (country_id != '') {
+                $.ajax({
+                    url: "<?php echo base_url(); ?>AjaxController/fetch_state",
+                    method: "POST",
+                    data: {
+                        "country_id": country_id,
+                        "state_id": row_state_id,
+                      
+                    },
+                    success: function (data) {
+                        $('#states_' + row_count).html(data);
+                        $('#citys_' + row_count).html('<option value="">Select City</option>');
+                    }
+                });
+            }
+            else {
+                $('#states_' + row_count).html('<option value="">Select country first</option>');
+                $('#citys_' + row_count).html('<option value="">Select state first</option>');
+            }
+        });
+
+    }
+
+    function getCity()
+    {
+        $(".statesscs").each(function (index){
+        // console.log($(this));
+        var row_city_id = $(this).attr("pre_city");
+        var row_count = $(this).attr("row_count");
+        var state_id =  $(this).attr("pres_state");
+       
+        var country_id = $('#countrys_' + row_count).val();
+        if (country_id != '') {
+            $.ajax({
+                type: 'POST',
+                url: "<?php echo base_url(); ?>AjaxController/fetch_city",
+                data: {
+                    "state_id": state_id,
+                    "country_id": country_id,
+                    "city_id": row_city_id
+                },
+                success: function (data) {
+                    $('#citys_' + row_count).html(data);
+                }
+            });
+        } else {
             $('#states' + row_count).html('<option value="">Select country first</option>');
             $('#citys_' + row_count).html('<option value="">Select state first</option>');
         }
     });
+    }
+    
 
     function addAddressLine() {
         var container = document.getElementById("addressFields");
@@ -508,22 +553,23 @@
 
     function edit_details(id) {
 
-
         $.ajax({
-                type: 'POST',
-                url: "<?php echo base_url(); ?>UserDetails/givemeAddress",
-                data: {
-                    id: id
-                },
-                success: function (response) {
-                  
-                    $("#addressFields1").html(response);
-                },
-                error: function (xhr, status, error) {
-                    // Handle error if AJAX request fails
-                    console.error(xhr.responseText);
-                }
-            });
+            type: 'POST',
+            url: "<?php echo base_url(); ?>UserDetails/givemeAddress",
+            data: {
+                id: id
+            },
+            success: function (response) {
+
+                $("#addressFields1").html(response);
+                getstate();
+                getCity();
+            },
+            error: function (xhr, status, error) {
+               
+                console.error(xhr.responseText);
+            }
+        });
 
         let xhr = new XMLHttpRequest();
 
@@ -537,64 +583,11 @@
             edit_form.elements['email'].value = data.player_details.email;
             edit_form.elements['contact'].value = data.player_details.contact;
             edit_form.elements['gender'].value = data.player_details.gender;
-            // edit_form.elements['address'].value = data.address_details.address;
-            // edit_form.elements['player_id'].value = data.player_details.id;
+            
+           
+            edit_form.elements['player_id'].value = data.player_details.id;
             let imageElement = document.getElementsByName('image')[0];
             imageElement.src = data.player_details.profile;
-
-
-            // let stateSelect = document.getElementById('state_1');
-            // let citySelect = document.getElementById('city_1');
-
-            // let countrySelect = edit_form.elements['country'];
-            // let selectedCountryId = data.address_details.country_id;
-            // let selectedStateId = data.address_details.state_id;
-
-            let countrySelect = edit_form.elements['country'];
-            countrySelect.value = data.address_details.country_id;
-
-            // let countryOptions = countrySelect.options;
-            // for (let i = 0; i < countryOptions.length; i++) {
-            //     if (countryOptions[i].value === data.address_details.country_id) {
-            //         countrySelect.selectedIndex = i;
-            //         break;
-            //     }
-            // }
-
-
-            // Fetching state..
-            let stateSelect = edit_form.elements['state'];
-            // let stateOptions = stateSelect.options;
-
-            $.ajax({
-                url: "<?php echo base_url(); ?>AjaxController/fetch_state",
-                method: "POST",
-                data: { country_id: data.address_details.country_id },
-                success: function (stateData) {
-    
-                    let stateSelect = edit_form.elements['state'];
-                    stateSelect.innerHTML = stateData;
-                    stateSelect.value = data.address_details.state_id;
-                    // Fetching ciitiess.
-                    // let citySelect = edit_form.elements['city'];
-                    // let cityOptions = citySelect.options
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "<?php echo base_url(); ?>AjaxController/fetch_city",
-                        data: {
-                            state_id: data.address_details.state_id,
-                            country_id: data.address_details.country_id
-                        },
-                        success: function (cityData) {
-                            let citySelect = edit_form.elements['city'];
-                            citySelect.innerHTML = cityData;
-                            citySelect.value = data.address_details.city_id;
-                   
-                        }
-                    });
-                }
-            });
 
 
         }
@@ -607,6 +600,7 @@
     function submit_edit() {
 
         let data = new FormData();
+
         data.append('edit_user', '');
         data.append('player_id', edit_form.elements['player_id'].value);
         data.append('name', edit_form.elements['name'].value);
@@ -615,10 +609,28 @@
         data.append('profile', edit_form.elements['profile'].files[0]);
         data.append('gender', edit_form.elements['gender'].value);
 
-        data.append('state', edit_form.elements['state'].value);
-        data.append('country', edit_form.elements['country'].value);
-        data.append('city', edit_form.elements['city'].value);
-        data.append('address', edit_form.elements['address'].value);
+         for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['address_' + i]) {
+                data.append('address_' + i, edit_form.elements['address_' + i].value);
+            }
+        }
+        for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['country_' + i]) {
+                data.append('country_' + i, edit_form.elements['country_' + i].value);
+            }
+        }
+        for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['state_' + i]) {
+                data.append('state_' + i, edit_form.elements['state_' + i].value);
+            }
+        }
+        for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['city_' + i]) {
+                data.append('city_' + i, edit_form.elements['city_' + i].value);
+            }
+        }
+
+
 
         let xhr = new XMLHttpRequest();
 

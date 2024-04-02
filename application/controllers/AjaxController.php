@@ -42,8 +42,13 @@ class AjaxController extends CI_Controller
 
     function fetch_state()
     {
+
+        // echo "<pre>";
+        // print_r($_POST);
+        // exit;
         if ($this->input->post("country_id")) {
-            echo $this->AjaxModel->fetch_state($this->input->post("country_id"));
+            $state_id = $this->input->post("state_id");
+            echo $this->AjaxModel->fetch_state($this->input->post("country_id"),$state_id);
 
         }
     }
@@ -51,7 +56,10 @@ class AjaxController extends CI_Controller
     function fetch_city()
     {
         if ($this->input->post("state_id")) {
-            echo $this->AjaxModel->fetch_city($this->input->post("state_id"));
+            
+            $city_id = $this->input->post("city_id");
+         
+            echo $this->AjaxModel->fetch_city($this->input->post("state_id"),$city_id);
 
         }
     }

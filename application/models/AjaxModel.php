@@ -22,26 +22,37 @@ class AjaxModel extends CI_Model
     return $query->num_rows();
    }
 
-    function fetch_state($country_id)
+    function fetch_state($country_id,$state_id=null)
     {
+        // echo $state_id;
+        // exit;
         $this->db->where("country_id", $country_id);
         $this->db->order_by("name", "ASC");
         $query = $this->db->get("states");
         $output = '<option value="">Select State</option>';
         foreach ($query->result() as $row) {
-            $output .= '<option value ="' . $row->id . '">' . $row->name . '</option>';
+
+            $sel = '';
+            if(!empty($state_id) && isset($state_id)){
+                $sel  = ( $row->id == $state_id ) ?'selected':'';
+            }
+            $output .= '<option value ="' . $row->id . '" '.$sel.'>' . $row->name . '</option>';
         }
         return $output;
     }
 
-    function fetch_city($state_id)
+    function fetch_city($state_id,$city_id=null)
     {
         $this->db->where("state_id", $state_id);
         $this->db->order_by("name", "ASC");
         $query = $this->db->get("cities");
         $output = '<option value="">Select City</option>';
         foreach ($query->result() as $row) {
-            $output .= '<option value ="' . $row->id . '">' . $row->name . '</option>';
+            $sel = '';
+            if(!empty($city_id) && isset($city_id)){
+                $sel  = ( $row->id == $city_id ) ?'selected':'';
+            }
+            $output .= '<option value ="' . $row->id . '" '.$sel.'>' . $row->name . '</option>';
         }
         return $output;
     }
