@@ -214,6 +214,7 @@ class UserDetails extends CI_Controller
             $address_data .= '
             <div class="row">
                 <div class="col-md-12">
+                    <input name="address_id" type="hidden">
                     <label class="form-label">Address line</label>
                     <textarea id="address_' . $i . '" name="address_' . $i . '" class="form-control shadow-none" rows="1" required>' . $data->address . '</textarea>
                 </div>
@@ -277,6 +278,7 @@ class UserDetails extends CI_Controller
     public function editPlayer()
     {
         if (isset($_POST['get_player'])) {
+            
             $id = $this->input->post('get_player');
 
             $count = $this->AjaxModel->fetch_Address_count($id);
@@ -292,10 +294,11 @@ class UserDetails extends CI_Controller
     public function submiteditPlayer()
     {
         if (isset($_POST['edit_user'])) {
-            
+
             $name = $this->input->post('name');
             $email = $this->input->post('email');
             $player_id = $this->input->post('player_id');
+            $address_id =$this->input->post('address_id');
             $contact = $this->input->post('contact');
             $gender = $this->input->post('gender');
 
@@ -346,21 +349,26 @@ class UserDetails extends CI_Controller
                 }
 
             }
+            // echo "<pre>";
+            // print_r($addressCount);
+            // exit;
             //adding full address in database
-            if ($addressCount == 3) {
-                $full_address = $_POST['address'] . ", " . $_POST['address_2'] . ", " . $_POST['address_3'];
-            } else if ($addressCount == 2) {
-                $full_address = $_POST['address'] . ", " . $_POST['address_2'];
-            } else {
-                $full_address = $_POST['address'];
+            if ($addressCount == 4) {
+                $full_address = $_POST['address_1'] . ", " . $_POST['address_2'] . ", " . $_POST['address_3'];
+            } else if ($addressCount == 3) {
+                $full_address = $_POST['address_1'] . ", " . $_POST['address_2'];
+            } else if($addressCount == 2) {
+                $full_address = $_POST['address_1'];
             }
 
 
+            if (isset($_POST['city_1'])) {
 
-            if (isset($_POST['city'])) {
-                $city_id = $this->input->post('city');
-                $state_id = $this->input->post('state');
-                $country_id = $this->input->post('country');
+                // $this->PlayerModel->deletePlayerAd($player_id);
+
+                $city_id = $this->input->post('city_1');
+                $state_id = $this->input->post('state_1');
+                $country_id = $this->input->post('country_1');
 
                 $data2 = array(
                     'address' => $full_address,
@@ -368,7 +376,35 @@ class UserDetails extends CI_Controller
                     'state_id' => $state_id,
                     'city_id' => $city_id
                 );
-                if ($this->PlayerModel->updatePlayerAd($player_id, $data2)) {
+
+                if (isset($_POST['city_2'])) {
+                    $city_id = $this->input->post('city_2');
+                    $state_id = $this->input->post('state_2');
+                    $country_id = $this->input->post('country_2');
+                    $data3 = array(
+                        'address' => $full_address,
+                        'country_id' => $country_id,
+                        'state_id' => $state_id,
+                        'city_id' => $city_id
+                    );
+
+                    if (isset($_POST['city_3'])) {
+
+                        $city_id = $this->input->post('city_3');
+                        $state_id = $this->input->post('state_3');
+                        $country_id = $this->input->post('country_3');
+                        $data4 = array(
+                            'address' => $full_address,
+                            'country_id' => $country_id,
+                            'state_id' => $state_id,
+                            'city_id' => $city_id
+                        );
+                        $this->PlayerModel->updatePlayerAd($address_id,$player_id,$data4);
+                    }
+
+                    $this->PlayerModel->updatePlayerAd($address_id,$player_id, $data3);
+                }
+                if ($this->PlayerModel->updatePlayerAd($address_id,$player_id, $data2)) {
                     echo 1;
                 } else {
                     return false;

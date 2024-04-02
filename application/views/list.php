@@ -211,6 +211,7 @@
                         <div class="container-fluid">
                             <div class="row">
                             <input name="player_id" type="hidden">
+                           
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Player Name</label>
                                     <input name="name" type="text" class="form-control shadow-none" required>
@@ -391,6 +392,7 @@
                 $.ajax({
                     url: "<?php echo base_url(); ?>AjaxController/fetch_state",
                     method: "POST",
+                    async:false,
                     data: {
                         "country_id": country_id,
                         "state_id": row_state_id,
@@ -583,8 +585,9 @@
             edit_form.elements['email'].value = data.player_details.email;
             edit_form.elements['contact'].value = data.player_details.contact;
             edit_form.elements['gender'].value = data.player_details.gender;
-            
            
+            edit_form.elements['address_id'].value =data.address_details.id;
+        
             edit_form.elements['player_id'].value = data.player_details.id;
             let imageElement = document.getElementsByName('image')[0];
             imageElement.src = data.player_details.profile;
@@ -603,6 +606,7 @@
 
         data.append('edit_user', '');
         data.append('player_id', edit_form.elements['player_id'].value);
+        data.append('address_id', edit_form.elements['address_id'].value);
         data.append('name', edit_form.elements['name'].value);
         data.append('email', edit_form.elements['email'].value);
         data.append('contact', edit_form.elements['contact'].value);

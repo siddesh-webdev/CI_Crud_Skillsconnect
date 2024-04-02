@@ -94,7 +94,7 @@ class PlayerModel extends CI_Model
             ->get()
             ->row();
 
-        $address_details = $this->db->select('state_id, country_id, city_id,address')
+        $address_details = $this->db->select('state_id, country_id, city_id,address,id')
             ->from('player_address')
             ->where('player_id', $id)
             ->get()
@@ -123,10 +123,14 @@ class PlayerModel extends CI_Model
         }
     }
 
-    function updatePlayerAd($id, $data)
+    function updatePlayerAd($address_id,$id, $data)
     {
-        $this->db->where('player_id', $id);
+        $array = ['id' => $address_id, 'player_id' => $id];
+        $this->db->where($array);
         $result = $this->db->update('player_address', $data);
+
+        // $result=$this->db->insert('player_address', $data);
+
         if ($result) {
             return true;
         } else {
@@ -149,6 +153,11 @@ class PlayerModel extends CI_Model
             'address_details' => $address_details,
             'address_count' => $address_count
         );
+    }
+
+    function deletePlayerAd($id){
+        $this->db->where('player_id', $id);
+        $this->db->delete('player_address');
     }
 }
 ?>
