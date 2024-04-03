@@ -70,7 +70,10 @@
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <?php echo form_button('button_text', 'Add More', ['type' => 'button', 'onclick' => 'addAddressLine()', 'class' => 'btn btn-sm mb-2 btn-outline-dark shadow-none d-flex justify-content-start', 'row_count' => "1"]); ?>
-
+                           
+                            <div class="col-md-4 mt-2">
+                            <button name="remove" type="button" class="btn btn-sm btn-danger" onclick="removeAddressLine(this)">Remove</button>
+                            </div>
                         </div>
                       
                     </div>
@@ -142,7 +145,7 @@
             // Check if the maximum limit has not been reached       
             var addressLine = document.createElement("div");
             // addressLine.classList.add("row", "mb-3");
-            addressLine.innerHTML = '<div class="mb-3">' +
+            addressLine.innerHTML = '<div class="help mb-3">' +
                 '<textarea id="address_' + row_count + '" name="address_' + row_count + '" class="form-control shadow-none" rows="1" placeholder="Address" required></textarea>' +
                 '</div>' +
                 '<div class="mb-3">' +
@@ -166,18 +169,17 @@
 
             container.appendChild(addressLine);
         } else {
-            alert('error', "You have reached the maximum limit of address lines.", 'image-alert');
+            alert("You have reached the maximum limit of address lines.");
         }
 
     }
-    function removeAddressLine() {
-        var container = document.getElementById("addressFields");
-        var addressLines = container.getElementsByClassName("row");
-        if (addressLines.length > 1) {
-            container.removeChild(addressLines[addressLines.length - 1]);
-        }
+    function removeAddressLine(button) {
+       var rowToRemove = button.closest('.row');
+        rowToRemove.remove();
+     
     }
 
+  
     let add_form = document.getElementById('add-form');
 
     add_form.addEventListener('submit', (e) => {
