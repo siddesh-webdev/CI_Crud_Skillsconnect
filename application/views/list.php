@@ -258,7 +258,7 @@
                                 </div>
                                 <!-- Button to add more address fields -->
                                 <div class="col-md-6 mb-3">
-                                    <button type="button" onclick="addAddressLine()"
+                                    <button type="button" onclick="addAddressLine2()"
                                         class="btn btn-outline-dark shadow-none" row_count="1">Add
                                         more</button>
                                 </div>
@@ -481,6 +481,48 @@
             alert('error', "You have reached the maximum limit of address lines.", 'image-alert');
         }
     }
+    function addAddressLine2() {
+
+        var container = document.getElementById("addressFields1");
+        var addressLines = container.getElementsByClassName("row");
+        var row_count = $(".addressFields1").attr("row_count");
+
+        if (addressLines.length < 5) {
+            row_count++;
+            $("#addressFields1").attr("row_count", row_count);
+            // Check if the maximum limit has not been reached
+            var addressLine = document.createElement("div");
+            // addressLine.classList.add("row", "mb-3");
+            addressLine.innerHTML = '<div class="row">' +
+                '<div class="col-md-12">' +
+                '<label class="form-label">Address line</label>' +
+                '<textarea id="address_' + row_count + '" name="address_' + row_count + '" class="form-control shadow-none" rows="1" required></textarea>' +
+                '</div>' +
+                '<div class="col-md-4 mb-3 mt-2">' +
+                '<label class="form-label">Country</label>' +
+                '<select id="country_' + row_count + '" name="country_' + row_count + '" class="form-select country" aria-label="Default select example" row_count="' + row_count + '">' +
+                '<option selected>Select Country</option>' +
+                '<?php foreach ($countries as $row) { ?>' +
+                    "<option value='<?= $row->id ?>'><?= $row->name ?></option>" +
+                    '<?php } ?>' +
+                '</select></div><div class="col-md-4 mt-2">' +
+                '<label class="form-label">State</label>' +
+                '<select id="state_' + row_count + '" name="state_' + row_count + '" class="form-select statessc" aria-label="Default select example" row_count="' + row_count + '">' +
+                '<option value="">Select state</option>' +
+                '</select>' + '</div>' +
+                '<div class="col-md-4 mt-2">' +
+                '<label class="form-label">City</label>' +
+                '<select id="city_' + row_count + '" name="city_' + row_count + '" class="form-select" aria-label="Default select example">' +
+                '<option value="">Select city</option>' +
+                '</select>' +
+                '</div>';
+
+
+            container.appendChild(addressLine);
+        } else {
+            alert('error', "You have reached the maximum limit of address lines.", 'image-alert');
+        }
+    }
 
     let add_form = document.getElementById('add-form');
 
@@ -604,20 +646,7 @@
             var addressId = $(this).val();
             addressIds.push(addressId);
         });
-        // addressIds=JSON.stringify(addressIdse);
-        // $.ajax({
-        //     type:'POST',
-        //     url: "<?php echo base_url(); ?>UserDetails/submiteditPlayer",
-        //     data: {'address_ids':addressIds},
-        //     success:function()
-        //     {
-        //         console.log("gela data");
-        //     },
-        //     error: function (xhr, status, error) {
-        //     console.error(xhr.responseText);
-        //     }
-
-        // });
+   
     }
 
 
@@ -681,12 +710,13 @@
             modal.hide();
 
             if (this.responseText == 1) {
-                alert('Player Data Edited !');
+                alert('Server Down..!');
                 edit_form.reset();
                 get_players();
             }
             else {
-                alert('Server Down..!')
+                
+                alert('Player Data Edited !');
                 get_players();
             }
         }

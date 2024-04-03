@@ -300,20 +300,10 @@ class UserDetails extends CI_Controller
 
         if (isset($_POST['edit_user'])) {
 
-            // $add_id =address_id
-            // echo "<pre>";
-            // print_r("hello");
-            // print_r($address_id);
-            // exit;
-
-
-
-
             $name = $this->input->post('name');
             $email = $this->input->post('email');
             $player_id = $this->input->post('player_id');
             //through different ajax
-
 
             $contact = $this->input->post('contact');
             $gender = $this->input->post('gender');
