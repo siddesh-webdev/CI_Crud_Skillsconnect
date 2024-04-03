@@ -175,11 +175,15 @@
                                     </div>
                                 </div>
                                 <!-- Button to add more address fields -->
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3 ">
                                     <button type="button" onclick="addAddressLine()"
                                         class="btn btn-outline-dark shadow-none" row_count="1">Add
                                         more</button>
+                                    <!-- <button name="remove" type="button" onclick="removeAddressLine()"
+                                        class="btn btn-outline-dark shadow-none" row_count="1">Remove
+                                        </button> -->
                                 </div>
+
 
 
                             </div>
@@ -203,7 +207,7 @@
                 <form id="edit_form" enctype="multipart/form-data" method="post" action="">
                     <div class="modal-header">
                         <h5 class="modal-title d-flex align-items-center"><i
-                                class="bi bi-person-lines-fill fs-3 me-2"></i> Team Details</h5>
+                                class="bi bi-person-lines-fill fs-3 me-2"></i> Edit Details</h5>
                         <button type="reset" class="btn-close shadow-none" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
@@ -448,9 +452,9 @@
         if (addressLines.length < 5) {
             row_count++;
             $("#addressFields").attr("row_count", row_count);
-            // Check if the maximum limit has not been reached
+
             var addressLine = document.createElement("div");
-            // addressLine.classList.add("row", "mb-3");
+
             addressLine.innerHTML = '<div class="row">' +
                 '<div class="col-md-12">' +
                 '<label class="form-label">Address line</label>' +
@@ -478,9 +482,65 @@
 
             container.appendChild(addressLine);
         } else {
-            alert('error', "You have reached the maximum limit of address lines.", 'image-alert');
+            alert("You have reached the maximum limit of address lines.");
         }
     }
+
+
+
+    function addAddressLine() {
+        var container = document.getElementById("addressFields");
+        var addressLines = container.getElementsByClassName("row");
+        var row_count = $(".addressFields").attr("row_count");
+
+        if (addressLines.length < 5) {
+            row_count++;
+            $("#addressFields").attr("row_count", row_count);
+
+            var addressLine = document.createElement("div");
+            addressLine.classList.add("row", "mb-3");
+
+            addressLine.innerHTML = '<div class="col-md-12">' +
+                '<label class="form-label">Address line</label>' +
+                '<textarea id="address_' + row_count + '" name="address_' + row_count + '" class="form-control shadow-none" rows="1" required></textarea>' +
+                '</div>' +
+                '<div class="col-md-4 mb-3 mt-2">' +
+                '<label class="form-label">Country</label>' +
+                '<select id="country_' + row_count + '" name="country_' + row_count + '" class="form-select country" aria-label="Default select example" row_count="' + row_count + '">' +
+                '<option selected>Select Country</option>' +
+                '<?php foreach ($countries as $row) { ?>' +
+                    "<option value='<?= $row->id ?>'><?= $row->name ?></option>" +
+                    '<?php } ?>' +
+                '</select></div><div class="col-md-4 mt-2">' +
+                '<label class="form-label">State</label>' +
+                '<select id="state_' + row_count + '" name="state_' + row_count + '" class="form-select statessc" aria-label="Default select example" row_count="' + row_count + '">' +
+                '<option value="">Select state</option>' +
+                '</select>' + '</div>' +
+                '<div class="col-md-4 mt-2">' +
+                '<label class="form-label">City</label>' +
+                '<select id="city_' + row_count + '" name="city_' + row_count + '" class="form-select" aria-label="Default select example">' +
+                '<option value="">Select city</option>' +
+                '</select>' +
+                '</div>' +
+                '<div class="col-md-12 mt-2">' +
+                '<button type="button" class="btn btn-danger" onclick="removeAddressLine(this)">Remove</button>' +
+                '</div>';
+
+            container.appendChild(addressLine);
+        } else {
+            alert("You have reached the maximum limit of address lines.");
+        }
+    }
+
+    function removeAddressLine(button) {
+        // var container = document.getElementById("addressFields1");
+        var rowToRemove = button.closest('.row');
+        // container.reset();
+        rowToRemove.remove();
+
+    }
+
+
     function addAddressLine2() {
 
         var container = document.getElementById("addressFields1");
@@ -490,9 +550,7 @@
         if (addressLines.length < 5) {
             row_count++;
             $("#addressFields1").attr("row_count", row_count);
-            // Check if the maximum limit has not been reached
             var addressLine = document.createElement("div");
-            // addressLine.classList.add("row", "mb-3");
             addressLine.innerHTML = '<div class="row">' +
                 '<div class="col-md-12">' +
                 '<label class="form-label">Address line</label>' +
@@ -515,7 +573,11 @@
                 '<select id="city_' + row_count + '" name="city_' + row_count + '" class="form-select" aria-label="Default select example">' +
                 '<option value="">Select city</option>' +
                 '</select>' +
+                '</div>' +
+                '<div class="col-md-12 mt-2 mb-2">' +
+                '<button type="button" class="btn btn-danger" onclick="removeAddressLine(this)">Remove</button>' +
                 '</div>';
+
 
 
             container.appendChild(addressLine);
@@ -590,7 +652,6 @@
 
     });
 
-
     let edit_form = document.getElementById('edit_form');
 
     function edit_details(id) {
@@ -606,7 +667,7 @@
                 $("#addressFields1").html(response);
                 getstate();
                 getCity();
-                
+
             },
             error: function (xhr, status, error) {
 
@@ -646,7 +707,7 @@
             var addressId = $(this).val();
             addressIds.push(addressId);
         });
-   
+
     }
 
 
@@ -663,6 +724,7 @@
         data.append('profile', edit_form.elements['profile'].files[0]);
         data.append('gender', edit_form.elements['gender'].value);
         getaddressId();
+
         for (let i = 1; i < 5; i++) {
 
             if (edit_form.elements['address_id_' + i]) {
@@ -690,13 +752,12 @@
                 data.append('city_' + i, edit_form.elements['city_' + i].value);
             }
         }
-        
+
         for (let i = 1; i < 5; i++) {
             if (edit_form.elements['address_' + i]) {
                 data.append('address_' + i, edit_form.elements['address_' + i].value);
             }
         }
-
 
 
         let xhr = new XMLHttpRequest();
@@ -706,7 +767,7 @@
         xhr.onload = function () {
 
             var myModal = document.getElementById('editModel');
-            var modal = bootstrap.Modal.getInstance(myModal); 
+            var modal = bootstrap.Modal.getInstance(myModal);
             modal.hide();
 
             if (this.responseText == 1) {
@@ -715,13 +776,13 @@
                 get_players();
             }
             else {
-                
+
                 alert('Player Data Edited !');
                 get_players();
             }
         }
         xhr.send(data);
-      
+
 
     }
 

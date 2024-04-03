@@ -125,11 +125,18 @@ class PlayerModel extends CI_Model
 
     function updatePlayerAd($address_id,$id, $data)
     {
+        if($address_id==null)
+        {
+            $data['player_id'] = $id;
+            $this->db->insert('player_address', $data);
+        }
+
         $array = ['id' => $address_id, 'player_id' => $id];
         $this->db->where($array);
         $result = $this->db->update('player_address', $data);
 
         // $result=$this->db->insert('player_address', $data);
+       
 
         if ($result) {
             return true;
