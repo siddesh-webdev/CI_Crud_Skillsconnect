@@ -210,8 +210,8 @@
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="row">
-                            <input name="player_id" type="hidden">
-                           
+                                <input name="player_id" type="hidden">
+
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Player Name</label>
                                     <input name="name" type="text" class="form-control shadow-none" required>
@@ -253,7 +253,7 @@
                                 <!-- Address details -->
                                 <div id="addressFields1" class="addressFields1" row_count="1">
 
-                                
+
 
                                 </div>
                                 <!-- Button to add more address fields -->
@@ -284,7 +284,7 @@
 
 
     //addd model ajax
-    //fetching state in basis of country  
+    //fetching state in basis of country
     $(document).on("change", '.country', function () {
 
         var country_id = $(this).val();
@@ -330,7 +330,7 @@
         }
     });
 
-  //editting model
+    //editting model
     $(document).on("change", '.country1', function () {
 
         var country_id = $(this).val();
@@ -378,25 +378,25 @@
     });
 
 
-  //edit model ajax
+    //edit model ajax
     function getstate() {
-      
+
         $(".country1").each(function (index) {
-            // console.log($(this));
+            console.log($(this));
             var country_id = $(this).val();
             var row_count = $(this).attr("row_count");
             var row_state_id = $(this).attr("pre_state");
-          
+
 
             if (country_id != '') {
                 $.ajax({
                     url: "<?php echo base_url(); ?>AjaxController/fetch_state",
                     method: "POST",
-                    async:false,
+                    async: false,
                     data: {
                         "country_id": country_id,
                         "state_id": row_state_id,
-                      
+
                     },
                     success: function (data) {
                         $('#states_' + row_count).html(data);
@@ -412,35 +412,33 @@
 
     }
 
-    function getCity()
-    {
-        $(".statesscs").each(function (index){
-        // console.log($(this));
-        var row_city_id = $(this).attr("pre_city");
-        var row_count = $(this).attr("row_count");
-        var state_id =  $(this).attr("pres_state");
-       
-        var country_id = $('#countrys_' + row_count).val();
-        if (country_id != '') {
-            $.ajax({
-                type: 'POST',
-                url: "<?php echo base_url(); ?>AjaxController/fetch_city",
-                data: {
-                    "state_id": state_id,
-                    "country_id": country_id,
-                    "city_id": row_city_id
-                },
-                success: function (data) {
-                    $('#citys_' + row_count).html(data);
-                }
-            });
-        } else {
-            $('#states' + row_count).html('<option value="">Select country first</option>');
-            $('#citys_' + row_count).html('<option value="">Select state first</option>');
-        }
-    });
+    function getCity() {
+        $(".statesscs").each(function (index) {
+            console.log($(this));
+            var row_city_id = $(this).attr("pre_city");
+            var row_count = $(this).attr("row_count");
+            var state_id = $(this).attr("pres_state");
+
+            var country_id = $('#countrys_' + row_count).val();
+            if (country_id != '') {
+                $.ajax({
+                    type: 'POST',
+                    url: "<?php echo base_url(); ?>AjaxController/fetch_city",
+                    data: {
+                        "state_id": state_id,
+                        "country_id": country_id,
+                        "city_id": row_city_id
+                    },
+                    success: function (data) {
+                        $('#citys_' + row_count).html(data);
+                    }
+                });
+            } else {
+                $('#states' + row_count).html('<option value="">Select country first</option>');
+                $('#citys_' + row_count).html('<option value="">Select state first</option>');
+            }
+        });
     }
-    
 
     function addAddressLine() {
         var container = document.getElementById("addressFields");
@@ -450,7 +448,7 @@
         if (addressLines.length < 5) {
             row_count++;
             $("#addressFields").attr("row_count", row_count);
-            // Check if the maximum limit has not been reached       
+            // Check if the maximum limit has not been reached
             var addressLine = document.createElement("div");
             // addressLine.classList.add("row", "mb-3");
             addressLine.innerHTML = '<div class="row">' +
@@ -566,9 +564,10 @@
                 $("#addressFields1").html(response);
                 getstate();
                 getCity();
+                
             },
             error: function (xhr, status, error) {
-               
+
                 console.error(xhr.responseText);
             }
         });
@@ -585,9 +584,9 @@
             edit_form.elements['email'].value = data.player_details.email;
             edit_form.elements['contact'].value = data.player_details.contact;
             edit_form.elements['gender'].value = data.player_details.gender;
-           
-            edit_form.elements['address_id'].value =data.address_details.id;
-        
+
+            // edit_form.elements['address_id'].value =data.address_details.id;
+
             edit_form.elements['player_id'].value = data.player_details.id;
             let imageElement = document.getElementsByName('image')[0];
             imageElement.src = data.player_details.profile;
@@ -599,6 +598,28 @@
     }
 
 
+    function getaddressId() {
+        var addressIds = [];
+        $('.eve').each(function () {
+            var addressId = $(this).val();
+            addressIds.push(addressId);
+        });
+        // addressIds=JSON.stringify(addressIdse);
+        // $.ajax({
+        //     type:'POST',
+        //     url: "<?php echo base_url(); ?>UserDetails/submiteditPlayer",
+        //     data: {'address_ids':addressIds},
+        //     success:function()
+        //     {
+        //         console.log("gela data");
+        //     },
+        //     error: function (xhr, status, error) {
+        //     console.error(xhr.responseText);
+        //     }
+
+        // });
+    }
+
 
     function submit_edit() {
 
@@ -606,14 +627,21 @@
 
         data.append('edit_user', '');
         data.append('player_id', edit_form.elements['player_id'].value);
-        data.append('address_id', edit_form.elements['address_id'].value);
+        // data.append('address_id', edit_form.elements['address_id'].value);
         data.append('name', edit_form.elements['name'].value);
         data.append('email', edit_form.elements['email'].value);
         data.append('contact', edit_form.elements['contact'].value);
         data.append('profile', edit_form.elements['profile'].files[0]);
         data.append('gender', edit_form.elements['gender'].value);
+        getaddressId();
+        for (let i = 1; i < 5; i++) {
 
-         for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['address_id_' + i]) {
+                data.append('address_id_' + i, edit_form.elements['address_id_' + i].value);
+            }
+        }
+
+        for (let i = 1; i < 5; i++) {
             if (edit_form.elements['address_' + i]) {
                 data.append('address_' + i, edit_form.elements['address_' + i].value);
             }
@@ -633,6 +661,12 @@
                 data.append('city_' + i, edit_form.elements['city_' + i].value);
             }
         }
+        
+        for (let i = 1; i < 5; i++) {
+            if (edit_form.elements['address_' + i]) {
+                data.append('address_' + i, edit_form.elements['address_' + i].value);
+            }
+        }
 
 
 
@@ -643,7 +677,7 @@
         xhr.onload = function () {
 
             var myModal = document.getElementById('editModel');
-            var modal = bootstrap.Modal.getInstance(myModal); // Returns a Bootstrap modal instance
+            var modal = bootstrap.Modal.getInstance(myModal); 
             modal.hide();
 
             if (this.responseText == 1) {
@@ -657,6 +691,7 @@
             }
         }
         xhr.send(data);
+      
 
     }
 

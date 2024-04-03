@@ -214,7 +214,7 @@ class UserDetails extends CI_Controller
             $address_data .= '
             <div class="row">
                 <div class="col-md-12">
-                    <input name="address_id" type="hidden">
+                 <input class="eve" name="address_id_' . $i . '" id="address_id_' . $i . '" type="hidden" value="' . $data->id . '">
                     <label class="form-label">Address line</label>
                     <textarea id="address_' . $i . '" name="address_' . $i . '" class="form-control shadow-none" rows="1" required>' . $data->address . '</textarea>
                 </div>
@@ -248,13 +248,13 @@ class UserDetails extends CI_Controller
                         <option value="">Select city</option>
                     </select>
                 </div>
+                
             </div>';
             $i++;
 
 
         }
 
-        // Echo or return the generated HTML
         echo $address_data;
     }
 
@@ -278,13 +278,12 @@ class UserDetails extends CI_Controller
     public function editPlayer()
     {
         if (isset($_POST['get_player'])) {
-            
+
             $id = $this->input->post('get_player');
 
             $count = $this->AjaxModel->fetch_Address_count($id);
 
             $data = $this->PlayerModel->getPlayer($id);
-
 
             echo $data;
         }
@@ -293,12 +292,29 @@ class UserDetails extends CI_Controller
 
     public function submiteditPlayer()
     {
+
+        // $address_id = $this->input->post('address_id_1');
+        //     echo "<pre>";
+        //     print_r( $address_id );
+        //     exit;
+
         if (isset($_POST['edit_user'])) {
+
+            // $add_id =address_id
+            // echo "<pre>";
+            // print_r("hello");
+            // print_r($address_id);
+            // exit;
+
+
+
 
             $name = $this->input->post('name');
             $email = $this->input->post('email');
             $player_id = $this->input->post('player_id');
-            $address_id =$this->input->post('address_id');
+            //through different ajax
+
+
             $contact = $this->input->post('contact');
             $gender = $this->input->post('gender');
 
@@ -337,8 +353,6 @@ class UserDetails extends CI_Controller
             );
 
 
-
-
             $addressCount = 1;
             // Iterate through each address field
             for ($i = 1; $i < 5; $i++) {
@@ -349,22 +363,18 @@ class UserDetails extends CI_Controller
                 }
 
             }
-            // echo "<pre>";
-            // print_r($addressCount);
-            // exit;
-            //adding full address in database
+
             if ($addressCount == 4) {
                 $full_address = $_POST['address_1'] . ", " . $_POST['address_2'] . ", " . $_POST['address_3'];
             } else if ($addressCount == 3) {
                 $full_address = $_POST['address_1'] . ", " . $_POST['address_2'];
-            } else if($addressCount == 2) {
+            } else if ($addressCount == 2) {
                 $full_address = $_POST['address_1'];
             }
 
 
             if (isset($_POST['city_1'])) {
-
-                // $this->PlayerModel->deletePlayerAd($player_id);
+                $add1 = $this->input->post('address_id_1');
 
                 $city_id = $this->input->post('city_1');
                 $state_id = $this->input->post('state_1');
@@ -378,6 +388,9 @@ class UserDetails extends CI_Controller
                 );
 
                 if (isset($_POST['city_2'])) {
+
+                    $add2 = $this->input->post('address_id_2');
+
                     $city_id = $this->input->post('city_2');
                     $state_id = $this->input->post('state_2');
                     $country_id = $this->input->post('country_2');
@@ -390,6 +403,7 @@ class UserDetails extends CI_Controller
 
                     if (isset($_POST['city_3'])) {
 
+                        $add3 = $this->input->post('address_id_3');
                         $city_id = $this->input->post('city_3');
                         $state_id = $this->input->post('state_3');
                         $country_id = $this->input->post('country_3');
@@ -399,12 +413,18 @@ class UserDetails extends CI_Controller
                             'state_id' => $state_id,
                             'city_id' => $city_id
                         );
-                        $this->PlayerModel->updatePlayerAd($address_id,$player_id,$data4);
+
+
+                        $this->PlayerModel->updatePlayerAd($add3, $player_id, $data4);
                     }
 
-                    $this->PlayerModel->updatePlayerAd($address_id,$player_id, $data3);
+
+                    $this->PlayerModel->updatePlayerAd($add2, $player_id, $data3);
                 }
-                if ($this->PlayerModel->updatePlayerAd($address_id,$player_id, $data2)) {
+                // $address_id = array(
+                //     'address1'=> $add1,   
+                // );
+                if ($this->PlayerModel->updatePlayerAd($add1, $player_id, $data2)) {
                     echo 1;
                 } else {
                     return false;
